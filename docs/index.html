@@ -40,6 +40,9 @@
   }
   .button.quiet { background: transparent; color: var(--text); border: 1px solid var(--line); }
   figure { margin: 28px 0; }
+  .scroll { overflow-x: auto; }
+  ol li, ul li { margin: 6px 0; }
+  h3 { font-size: 20px; margin: 22px 0 6px; }
   figure img { width: 100%; height: auto; border-radius: 14px; display: block; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45); }
   figcaption { color: var(--muted); font-size: 15px; margin-top: 10px; text-align: center; }
   section { padding: 30px 0; border-top: 1px solid var(--line); }
@@ -72,9 +75,11 @@
   <header>
     <img class="logo" src="assets/logo.svg" alt="">
     <h1>Alcatraz</h1>
-    <p class="tagline">A Mac-style lock screen for GNOME. Your desktop's theme on the lock screen, the wallpaper sharp, and a big clock near the top.</p>
+    <p class="tagline">A Mac-style lock screen for GNOME. It shows right away instead of a black screen, in your desktop's theme, with the wallpaper sharp and a big clock near the top.</p>
     <div class="buttons">
-      <a class="button" href="#install">Install</a>
+      <a class="button" href="#download">Download</a>
+      <a class="button quiet" href="#install">Install</a>
+      <a class="button quiet" href="#uninstall">Uninstall</a>
       <a class="button quiet" href="https://github.com/saikatnjm/alcatraz">Source on GitHub</a>
     </div>
   </header>
@@ -87,7 +92,14 @@
   <section>
     <h2>Why</h2>
     <p>GNOME switches extensions off while the screen is locked, and that includes User Themes, the extension that loads a shell theme. So the lock screen falls back to the default look whatever theme your desktop uses, and shows your wallpaper blurred and dark.</p>
-    <p>Alcatraz is allowed to stay on while the screen is locked. At the moment of locking it loads your desktop's shell theme, shows the wallpaper sharp, and puts the date above a large clock near the top, without AM or PM. Every part has its own switch.</p>
+    <p>GNOME also turns the screen black the moment you lock it. Alcatraz is allowed to stay on while the screen is locked, and when you lock:</p>
+    <ul>
+      <li><b>the lock screen shows right away</b>, as on a Mac, instead of a black screen. The display still goes off after 30 seconds without a key press or mouse move;</li>
+      <li><b>your desktop's shell theme</b> stays on the lock screen;</li>
+      <li><b>the wallpaper is sharp</b> instead of blurred and dark;</li>
+      <li><b>the date sits above a large clock near the top</b>, without AM or PM.</li>
+    </ul>
+    <p>Every part has its own switch.</p>
     <div class="pair">
       <figure>
         <img src="assets/gnome-lock-screen.jpg" width="1280" height="720" alt="GNOME's own lock screen: default theme, blurred dark wallpaper, the time above the date">
@@ -107,6 +119,7 @@
       <div class="card"><h3>One short moment per lock</h3><p>In the tests, dressing the lock screen took 50 to 170 milliseconds, mostly loading the theme: the same work User Themes does at every unlock.</p></div>
       <div class="card"><h3>Your password prompt is GNOME's</h3><p>Alcatraz does not touch the prompt, its place, or the way you unlock. The clock is only moved where it is painted.</p></div>
       <div class="card"><h3>It fails soft</h3><p>If a GNOME version changes a part of the lock screen that Alcatraz looks for, the lock screen simply stays GNOME's own.</p></div>
+      <div class="card"><h3>The display still sleeps</h3><p>GNOME switches the display off 30 seconds after the last key press or mouse move on a locked screen. A screen that went black because you left it idle stays black.</p></div>
       <div class="card"><h3>Leaves nothing behind</h3><p>Switched off, even while the screen is locked, the lock screen goes back to GNOME's own at once.</p></div>
       <div class="card"><h3>Tested by locking</h3><p>A hidden GNOME Shell is locked and unlocked again and again, and every part is checked: on GNOME 42, 46 and 51, and in the continuous integration on 42 to 51.</p></div>
     </div>
@@ -116,17 +129,53 @@
     </figure>
   </section>
 
+  <section id="download">
+    <h2>Download</h2>
+    <p>Every version stays available. Pick the zip for your GNOME version. To see which GNOME you have, open a terminal and run <code>gnome-shell --version</code>.</p>
+    <div class="scroll">
+    <table>
+      <tr><th>Version</th><th>Released</th><th>GNOME 42, 43, 44</th><th>GNOME 45 to 51</th><th>Notes</th></tr>
+      <tr><td><b>1.0.0</b> (newest)</td><td>24 Nov 2026</td>
+        <td><a href="https://github.com/saikatnjm/alcatraz/releases/download/v1.0.0/alcatraz-1.0.0-gnome42-44.shell-extension.zip">Download</a></td>
+        <td><a href="https://github.com/saikatnjm/alcatraz/releases/download/v1.0.0/alcatraz-1.0.0-gnome45-plus.shell-extension.zip">Download</a></td>
+        <td>First version</td></tr>
+    </table>
+    </div>
+    <p>What changed in each version: the <a href="https://github.com/saikatnjm/alcatraz/blob/main/CHANGELOG.md">changelog</a> and the <a href="https://github.com/saikatnjm/alcatraz/releases">releases page</a>.</p>
+  </section>
+
   <section id="install">
     <h2>Install</h2>
-    <p>Alcatraz needs GNOME 42 or newer. Keeping the theme needs the User Themes extension, the one that sets your shell theme (package <code>gnome-shell-extensions</code> on Debian and Ubuntu, <code>gnome-shell-extension-user-theme</code> on Fedora). The other parts work without it.</p>
-    <p><b>From a release:</b> download the zip for your GNOME version from the <a href="https://github.com/saikatnjm/alcatraz/releases">releases page</a>, <code>alcatraz-gnome42-44</code> for GNOME 42 to 44 or <code>alcatraz-gnome45-plus</code> for GNOME 45 and later, and install it with GNOME's own tool, which also prepares the settings:</p>
-    <pre><code>gnome-extensions install --force alcatraz-gnome45-plus.shell-extension.zip</code></pre>
-    <p>Log out and back in, switch Alcatraz on in the Extensions app, and lock the screen with Super+L.</p>
-    <p><b>From the source:</b></p>
+    <p>Alcatraz needs GNOME 42 or newer. Keeping the theme needs the User Themes extension, the one that sets your shell theme (package <code>gnome-shell-extensions</code> on Debian and Ubuntu, <code>gnome-shell-extension-user-theme</code> on Fedora). Everything else works without it.</p>
+    <ol>
+      <li>Download the zip for your GNOME version from the table above.</li>
+      <li>Install it with GNOME's own tool, which also prepares the settings (do not just unpack the zip). Use the name of the zip you downloaded:
+        <pre><code>gnome-extensions install --force ~/Downloads/alcatraz-1.0.0-gnome45-plus.shell-extension.zip</code></pre></li>
+      <li>Log out and back in. GNOME loads new extensions only at login.</li>
+      <li>Switch Alcatraz on in the <b>Extensions</b> app, or run:
+        <pre><code>gnome-extensions enable alcatraz@saikatnjm.github.io</code></pre></li>
+      <li>Lock the screen with <b>Super+L</b>.</li>
+    </ol>
+    <p><b>From the source</b> instead (needs <code>glib-compile-schemas</code> and <code>zip</code>), then log out and back in:</p>
     <pre><code>git clone https://github.com/saikatnjm/alcatraz.git
 cd alcatraz
 make install</code></pre>
-    <p>To remove it: <code>gnome-extensions uninstall alcatraz@saikatnjm.github.io</code>, or <code>make uninstall</code> in the source folder.</p>
+    <h3>Update</h3>
+    <p>Download the newer zip, run step 2 again with it, then log out and back in. Your settings are kept. From the source: <code>git pull</code> and <code>make install</code>.</p>
+  </section>
+
+  <section id="uninstall">
+    <h2>Uninstall</h2>
+    <ol>
+      <li>Switch Alcatraz off and remove it with one command:
+        <pre><code>gnome-extensions uninstall alcatraz@saikatnjm.github.io</code></pre>
+        Or open the <b>Extensions</b> app, open Alcatraz and press <b>Remove</b>. If you installed from the source, <code>make uninstall</code> in that folder does the same.</li>
+      <li>Optional: remove your Alcatraz settings too:
+        <pre><code>dconf reset -f /org/gnome/shell/extensions/alcatraz/</code></pre></li>
+      <li>Lock the screen: it is GNOME's own again.</li>
+    </ol>
+    <p>If the command says the extension does not exist (it was installed but never loaded), remove its folder:</p>
+    <pre><code>rm -r ~/.local/share/gnome-shell/extensions/alcatraz@saikatnjm.github.io</code></pre>
   </section>
 
   <section>
@@ -135,6 +184,7 @@ make install</code></pre>
       <img src="assets/settings.png" width="640" height="576" alt="The settings window of Alcatraz">
       <table>
         <tr><th>Setting</th><th>Default</th></tr>
+        <tr><td>Show the lock screen right away</td><td>on (the display goes off after 30 s without input)</td></tr>
         <tr><td>Keep the desktop's theme</td><td>on</td></tr>
         <tr><td>Change how the wallpaper shows</td><td>on: blur 0, brightness 85 %</td></tr>
         <tr><td>Date above the time</td><td>on</td></tr>
@@ -143,7 +193,7 @@ make install</code></pre>
         <tr><td>Style the clock</td><td>on: 96 pt and 20 pt, the desktop's font</td></tr>
       </table>
     </div>
-    <p>Open them from the Extensions app. Changes show the next time the screen locks.</p>
+    <p>Open them from the Extensions app (the gear next to Alcatraz), or run <code>gnome-extensions prefs alcatraz@saikatnjm.github.io</code>. Changes show the next time the screen locks. Switched off, each part is left exactly as GNOME shows it.</p>
   </section>
 
   <footer>

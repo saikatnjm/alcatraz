@@ -45,10 +45,16 @@ function alcatrazLinkRow(title, subtitle, uri) {
 function fillAlcatrazPreferences(window, settings, metadata) {
     const page = new Adw.PreferencesPage();
 
-    const theme = new Adw.PreferencesGroup({
-        title: _('Theme'),
+    const locking = new Adw.PreferencesGroup({
+        title: _('Locking'),
         description: _('Changes show the next time the screen locks (Super+L).'),
     });
+    locking.add(alcatrazSwitchRow(settings, 'keep-screen-on',
+        _('Show the lock screen right away'),
+        _('As on a Mac. Off: GNOME turns the screen black at once. Either way the display goes off after 30 seconds without input.')));
+    page.add(locking);
+
+    const theme = new Adw.PreferencesGroup({title: _('Theme')});
     theme.add(alcatrazSwitchRow(settings, 'desktop-theme',
         _('Keep the desktop\'s theme'),
         _('GNOME drops a shell theme set with User Themes while the screen is locked. This keeps it.')));

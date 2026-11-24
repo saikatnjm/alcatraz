@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="alcatraz">
   <schema id="org.gnome.shell.extensions.alcatraz" path="/org/gnome/shell/extensions/alcatraz/">
+    <key name="keep-screen-on" type="b">
+      <default>true</default>
+      <summary>Show the lock screen right after locking</summary>
+      <description>GNOME turns the screen black as soon as it is locked by hand. With this on, the lock screen shows instead, as on a Mac. The display still goes off after 30 seconds without input.</description>
+    </key>
     <key name="desktop-theme" type="b">
       <default>true</default>
       <summary>Keep the desktop's shell theme on the lock screen</summary>

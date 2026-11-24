@@ -57,6 +57,7 @@ const DEFAULTS = {
     'time-size': 96,
     'date-size': 20,
     'clock-font': '',
+    'keep-screen-on': true,
 };
 
 class AlcatrazProbe {
@@ -245,13 +246,23 @@ class AlcatrazProbe {
         return look;
     }
 
+    // Locks the screen by hand, as Super+L does. this._black says whether the screen was black
+    // afterwards (GNOME's fade), before the probe lifts it to see the lock screen.
     async _lock() {
         Main.screenShield.lock(false);
         await probeSleep(1200);
-        // A locked screen is blank until someone moves the mouse: do what that does.
-        Main.screenShield._longLightbox.lightOff();
-        Main.screenShield._shortLightbox.lightOff();
+        const shield = Main.screenShield;
+        this._black = shield._shortLightbox.active || shield._longLightbox.active;
+        // Do what moving the mouse does, so that the lock screen can be looked at.
+        shield._longLightbox.lightOff();
+        shield._shortLightbox.lightOff();
         await probeSleep(900);
+    }
+
+    _expectBlack(label, black) {
+        this._check(black ? `${label}: the screen turned black after locking, as GNOME does`
+            : `${label}: the lock screen showed right after locking, not a black screen`,
+        this._black === black && Main.screenShield.active, `black ${this._black}, screen saver active ${Main.screenShield.active}`);
     }
 
     async _unlock(label) {
@@ -289,6 +300,7 @@ class AlcatrazProbe {
         for (const round of ['first', 'second', 'third']) {
             this._step(`baseline, ${round} lock`);
             await this._lock();
+            this._expectBlack(`baseline, ${round} lock`, true);
             const look = this._expectStock(`baseline, ${round} lock`);
             this._report.notes[`${round}Look`] = look;
             if (round === 'first')
@@ -349,7 +361,7 @@ class AlcatrazProbe {
                 `${Main.getThemeStylesheet()?.get_path()} (wanted ${this._themeCss})`);
         }
         this._check('nothing is waiting or connected while the screen is unlocked',
-            !extension.stateObj._look._idleId && !extension.stateObj._look._themeId && !extension.stateObj._look._parts);
+            !extension.stateObj._look._idleId && !extension.stateObj._look._themeId && !extension.stateObj._look._activeId && !extension.stateObj._look._parts);
         await this._picture('1-desktop');
 
         // How long dressing the lock screen takes, and how often it happens: a stopwatch around
@@ -375,6 +387,7 @@ class AlcatrazProbe {
         this._report.notes.themeChangesAtFirstLock = themeChanges;
         this._check('first lock: the lock screen was dressed once',
             this._dressCalls.filter(call => call.dressed).length === 1, JSON.stringify(this._dressCalls));
+        this._expectBlack('first lock', false);
         let look = this._expectDressed('first lock');
         this._check('first lock: Alcatraz is still on and reported no error',
             extension.state === STATE_ACTIVE && !extension.error, `state ${extension.state}, error: ${extension.error ?? ''}`);
@@ -455,13 +468,14 @@ class AlcatrazProbe {
         if (userThemes)
             this._check('first lock: User Themes is on again after unlocking', userThemes.state === STATE_ACTIVE, `state ${userThemes.state}`);
         this._check('after unlocking nothing is waiting or connected',
-            !extension.stateObj._look._idleId && !extension.stateObj._look._themeId && !extension.stateObj._look._parts);
+            !extension.stateObj._look._idleId && !extension.stateObj._look._themeId && !extension.stateObj._look._activeId && !extension.stateObj._look._parts);
         await this._picture('5-unlocked');
 
         // ---- 2. A second lock.
         this._step('second lock');
         this._dressCalls.length = 0;
         await this._lock();
+        this._expectBlack('second lock', false);
         this._expectDressed('second lock');
         this._check('second lock: the lock screen was dressed once',
             this._dressCalls.filter(call => call.dressed).length === 1, JSON.stringify(this._dressCalls));
@@ -471,9 +485,10 @@ class AlcatrazProbe {
         this._step('every switch off');
         this._set(settings, {
             'desktop-theme': false, 'change-wallpaper': false, 'date-above-time': false,
-            'hide-am-pm': false, 'move-clock': false, 'style-clock': false,
+            'hide-am-pm': false, 'move-clock': false, 'style-clock': false, 'keep-screen-on': false,
         });
         await this._lock();
+        this._expectBlack('every switch off', true);
         this._expectStock('every switch off');
         await this._pressKey(Clutter.KEY_Control_L);
         look = this._look();
@@ -521,13 +536,29 @@ class AlcatrazProbe {
                 `${Main.getThemeStylesheet()?.get_path()}`);
         }
 
+        // ---- 6b. Left idle: GNOME fades the screen to black slowly and locks it. That black
+        // screen must stay black, also with the lock screen shown after locking by hand.
+        this._step('left idle');
+        this._set(settings, {});
+        Main.screenShield._onStatusChanged(3);      // GnomeSession.PresenceStatus.IDLE
+        await probeSleep(13000);
+        const shield = Main.screenShield;
+        this._check('left idle: the screen went black and locked, and stays black',
+            Main.sessionMode.isLocked && shield.active && shield._longLightbox.active,
+            `locked ${Main.sessionMode.isLocked}, active ${shield.active}, long fade ${shield._longLightbox.active}, short fade ${shield._shortLightbox.active}`);
+        shield._longLightbox.lightOff();
+        shield._shortLightbox.lightOff();
+        await probeSleep(900);
+        this._expectDressed('left idle');
+        await this._unlock('left idle');
+
         // ---- 7. Switched off and on while the screen is unlocked.
         this._step('off and on while unlocked');
         extension.stateObj.disable();
         extension.stateObj.enable();
         await probeSleep(300);
         this._check('switching off and on while unlocked leaves nothing waiting or connected',
-            !extension.stateObj._look._idleId && !extension.stateObj._look._themeId && !extension.stateObj._look._parts);
+            !extension.stateObj._look._idleId && !extension.stateObj._look._themeId && !extension.stateObj._look._activeId && !extension.stateObj._look._parts);
         this._check('Alcatraz is on at the end and reported no error', extension.state === STATE_ACTIVE && !extension.error,
             `state ${extension.state}, error: ${extension.error ?? ''}`);
 

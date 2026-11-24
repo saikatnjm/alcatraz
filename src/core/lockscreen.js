@@ -86,6 +86,19 @@ function lockScreenParts() {
     return asExpected ? parts : null;
 }
 
+/**
+ * The two fades of GNOME's screen shield: the short one that blackens a screen locked by hand,
+ * and the long one that blackens a screen left idle. Private to GNOME Shell like the lock
+ * screen's parts; null if they are not as expected, and then the screen is left to GNOME.
+ */
+function screenShieldFades() {
+    const shield = Main.screenShield;
+    const fades = {shield, short: shield?._shortLightbox, long: shield?._longLightbox};
+    const asExpected = typeof shield?.connect === 'function' && typeof fades.short?.lightOff === 'function' &&
+        typeof fades.short.active === 'boolean' && typeof fades.long?.active === 'boolean';
+    return asExpected ? fades : null;
+}
+
 /** Blurs and dims the wallpapers behind a lock screen. Blur 0 and brightness 100 leave them as they are. */
 function showWallpapers(wallpapers, blur, brightness) {
     const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
@@ -144,6 +157,10 @@ class LockScreenLook {
         this._keepDesktopTheme();
         if (!this._themeId)
             this._themeId = this._themeContext.connect('changed', () => this._keepDesktopTheme());
+        if (!this._activeId && this._settings.get_boolean('keep-screen-on') && screenShieldFades()) {
+            this._activeId = Main.screenShield.connect('active-changed', () => this._showLockScreen());
+            this._showLockScreen();
+        }
 
         const parts = lockScreenParts();
         if (!parts || parts.dialog === this._parts?.dialog)
@@ -211,6 +228,10 @@ class LockScreenLook {
             this._themeContext.disconnect(this._themeId);
             this._themeId = null;
         }
+        if (this._activeId) {
+            Main.screenShield.disconnect(this._activeId);
+            this._activeId = null;
+        }
         if (this._ownTheme && Main.getThemeStylesheet() === this._ownTheme) {
             Main.setThemeStylesheet(null);
             Main.loadTheme();
@@ -249,6 +270,17 @@ class LockScreenLook {
         Main.setThemeStylesheet(file.get_path());
         Main.loadTheme();
         this._ownTheme = Main.getThemeStylesheet();
+    }
+
+    // GNOME blackens a screen locked by hand at once, and lets the display go off while it is
+    // black. A Mac shows its lock screen instead. This lifts that fade, as moving the mouse does.
+    // GNOME's screen saver stays active, so the display still goes off after 30 seconds without
+    // input (gnome-settings-daemon), and a screen that went black because it was left idle (the
+    // long fade) stays black.
+    _showLockScreen() {
+        const fades = screenShieldFades();
+        if (fades?.shield.active && !fades.long.active && fades.short.active)
+            fades.short.lightOff();
     }
 
     // "4:25 PM" becomes "4:25": the digits and what stands between them. GNOME writes the time

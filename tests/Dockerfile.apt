@@ -1,0 +1,20 @@
+# GNOME Shell test image for Debian and Ubuntu (see tests/in-container.sh). It has GNOME Shell
+# and the User Themes extension, whose theme Alcatraz keeps on the lock screen.
+#   docker build -t alcatraz-test:gnome46 -f tests/Dockerfile.apt --build-arg BASE=ubuntu:24.04 tests
+ARG BASE=ubuntu:24.04
+FROM ${BASE}
+USER root
+ENV DEBIAN_FRONTEND=noninteractive
+RUN set -e; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      gnome-shell gnome-shell-extensions gjs libglib2.0-bin \
+      "$(apt-cache show dbus-daemon >/dev/null 2>&1 && echo dbus-daemon || echo dbus)" \
+      libgl1-mesa-dri libegl1 libgles2 librsvg2-common procps; \
+    rm -rf /var/lib/apt/lists/*; \
+    id tester >/dev/null 2>&1 || useradd -m tester
+# No systemd runs in the container. Without this folder GNOME Shell uses its built-in fallback
+# for login sessions instead of looking for logind on a system bus that is not there.
+RUN rm -rf /run/systemd
+USER tester
+WORKDIR /home/tester

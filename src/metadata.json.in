@@ -1,0 +1,11 @@
+{
+  "uuid": "alcatraz@saikatnjm.github.io",
+  "name": "Alcatraz",
+  "description": "A Mac-style lock screen for GNOME.\n\nGNOME switches extensions off while the screen is locked, the User Themes extension included. So the lock screen falls back to the default look, whatever shell theme your desktop uses. Alcatraz stays on while the screen is locked and, at the moment of locking:\n\n* loads the shell theme your desktop uses,\n* shows the wallpaper sharp instead of blurred and dark,\n* puts the date above a large clock near the top, without AM or PM.\n\nEvery part has its own switch. Blur, brightness, the sizes, the font and the height of the clock can be set.\n\nIt is light: nothing runs while the screen is unlocked, there is no timer, and the password prompt stays as GNOME made it.\n\nKeeping the theme needs the User Themes extension, the one that sets your shell theme. Mac is a trademark of Apple Inc.; Alcatraz is not connected with Apple.",
+  "shell-version": @SHELL_VERSIONS@,
+  "version-name": "@VERSION@",
+  "url": "https://github.com/saikatnjm/alcatraz",
+  "settings-schema": "org.gnome.shell.extensions.alcatraz",
+  "gettext-domain": "alcatraz",
+  "session-modes": ["user", "unlock-dialog"]
+}

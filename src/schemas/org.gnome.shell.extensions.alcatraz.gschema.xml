@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="alcatraz">
+  <schema id="org.gnome.shell.extensions.alcatraz" path="/org/gnome/shell/extensions/alcatraz/">
+    <key name="desktop-theme" type="b">
+      <default>true</default>
+      <summary>Keep the desktop's shell theme on the lock screen</summary>
+      <description>GNOME switches the User Themes extension off while the screen is locked. With this on, the theme it shows on the desktop is loaded again for the lock screen.</description>
+    </key>
+    <key name="change-wallpaper" type="b">
+      <default>true</default>
+      <summary>Change how the wallpaper shows on the lock screen</summary>
+      <description>With this off, the wallpaper stays blurred and dark, as GNOME shows it.</description>
+    </key>
+    <key name="wallpaper-blur" type="i">
+      <range min="0" max="100"/>
+      <default>0</default>
+      <summary>Blur of the wallpaper</summary>
+      <description>0 shows the picture sharp. GNOME's own value is 45 (60 before GNOME 44).</description>
+    </key>
+    <key name="wallpaper-brightness" type="i">
+      <range min="0" max="100"/>
+      <default>85</default>
+      <summary>Brightness of the wallpaper, in percent</summary>
+      <description>100 shows the picture as it is. GNOME's own value is 65 (55 before GNOME 44).</description>
+    </key>
+    <key name="date-above-time" type="b">
+      <default>true</default>
+      <summary>Show the date above the time</summary>
+    </key>
+    <key name="hide-am-pm" type="b">
+      <default>true</default>
+      <summary>Show only the digits of the time</summary>
+      <description>Removes AM and PM from a 12-hour clock.</description>
+    </key>
+    <key name="move-clock" type="b">
+      <default>true</default>
+      <summary>Move the clock up</summary>
+    </key>
+    <key name="clock-top" type="i">
+      <range min="0" max="40"/>
+      <default>12</default>
+      <summary>Distance of the clock from the top, in percent of the screen's height</summary>
+    </key>
+    <key name="style-clock" type="b">
+      <default>true</default>
+      <summary>Write the clock in bold white letters with a soft shadow</summary>
+    </key>
+    <key name="time-size" type="i">
+      <range min="24" max="200"/>
+      <default>96</default>
+      <summary>Size of the time, in points</summary>
+    </key>
+    <key name="date-size" type="i">
+      <range min="8" max="72"/>
+      <default>20</default>
+      <summary>Size of the date, in points</summary>
+    </key>
+    <key name="clock-font" type="s">
+      <default>''</default>
+      <summary>Font family of the clock</summary>
+      <description>Empty uses the font the desktop is set to use.</description>
+    </key>
+  </schema>
+</schemalist>

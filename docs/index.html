@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alcatraz: a Mac-style lock screen for GNOME</title>
+<meta name="description" content="Alcatraz keeps your desktop's shell theme on the GNOME lock screen, shows the wallpaper sharp and puts a big clock near the top. GNOME 42 to 51. Nothing runs while you work.">
+<meta property="og:title" content="Alcatraz: a Mac-style lock screen for GNOME">
+<meta property="og:description" content="Your desktop's theme on the lock screen, the wallpaper sharp, and a big clock near the top. Nothing runs while you work.">
+<meta property="og:image" content="https://saikatnjm.github.io/alcatraz/assets/lock-screen.jpg">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #0d1012;
+    --panel: #171b1d;
+    --text: #e9ece9;
+    --muted: #a3aba6;
+    --accent: #c9d6cd;
+    --line: rgba(233, 236, 233, 0.1);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.6 Inter, "Cantarell", "Segoe UI", system-ui, sans-serif;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+  header { padding: 56px 0 24px; text-align: center; }
+  header img.logo { width: 88px; height: 88px; }
+  h1 { font-size: 46px; line-height: 1.1; margin: 14px 0 8px; letter-spacing: -0.5px; }
+  .tagline { font-size: 21px; color: var(--muted); margin: 0 auto; max-width: 640px; }
+  .buttons { margin: 26px 0 8px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .button {
+    display: inline-block; padding: 11px 20px; border-radius: 12px; text-decoration: none;
+    background: var(--accent); color: #0d1012; font-weight: 600;
+  }
+  .button.quiet { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  figure { margin: 28px 0; }
+  figure img { width: 100%; height: auto; border-radius: 14px; display: block; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45); }
+  figcaption { color: var(--muted); font-size: 15px; margin-top: 10px; text-align: center; }
+  section { padding: 30px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: 28px; margin: 0 0 12px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .pair figure { margin: 10px 0; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 14px; }
+  .card { background: var(--panel); border-radius: 14px; padding: 16px 18px; }
+  .card h3 { margin: 0 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--muted); font-size: 16px; }
+  pre {
+    background: #090b0c; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px;
+    overflow-x: auto; font-size: 15px;
+  }
+  code { font-family: "JetBrains Mono", "DejaVu Sans Mono", monospace; }
+  table { width: 100%; border-collapse: collapse; font-size: 16px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  .settings { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+  .settings img { max-width: 100%; border-radius: 12px; }
+  footer { padding: 30px 0 50px; color: var(--muted); font-size: 15px; border-top: 1px solid var(--line); }
+  @media (max-width: 720px) {
+    h1 { font-size: 36px; }
+    .pair, .settings { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img class="logo" src="assets/logo.svg" alt="">
+    <h1>Alcatraz</h1>
+    <p class="tagline">A Mac-style lock screen for GNOME. Your desktop's theme on the lock screen, the wallpaper sharp, and a big clock near the top.</p>
+    <div class="buttons">
+      <a class="button" href="#install">Install</a>
+      <a class="button quiet" href="https://github.com/saikatnjm/alcatraz">Source on GitHub</a>
+    </div>
+  </header>
+
+  <figure>
+    <img src="assets/lock-screen.jpg" width="1280" height="720" alt="The lock screen with Alcatraz: the date above a large bold clock near the top, over a sharp wallpaper of hills and a lighthouse in the evening fog">
+    <figcaption>GNOME 42 with the WhiteSur shell theme, locked, with Alcatraz.</figcaption>
+  </figure>
+
+  <section>
+    <h2>Why</h2>
+    <p>GNOME switches extensions off while the screen is locked, and that includes User Themes, the extension that loads a shell theme. So the lock screen falls back to the default look whatever theme your desktop uses, and shows your wallpaper blurred and dark.</p>
+    <p>Alcatraz is allowed to stay on while the screen is locked. At the moment of locking it loads your desktop's shell theme, shows the wallpaper sharp, and puts the date above a large clock near the top, without AM or PM. Every part has its own switch.</p>
+    <div class="pair">
+      <figure>
+        <img src="assets/gnome-lock-screen.jpg" width="1280" height="720" alt="GNOME's own lock screen: default theme, blurred dark wallpaper, the time above the date">
+        <figcaption>GNOME's own lock screen</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/lock-screen.jpg" width="1280" height="720" alt="The same desktop locked with Alcatraz">
+        <figcaption>The same desktop with Alcatraz</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Light, and careful</h2>
+    <div class="cards">
+      <div class="card"><h3>Nothing runs while you work</h3><p>No timer and no polling. Alcatraz only listens for the screen to lock and to unlock.</p></div>
+      <div class="card"><h3>One short moment per lock</h3><p>In the tests, dressing the lock screen took 50 to 170 milliseconds, mostly loading the theme: the same work User Themes does at every unlock.</p></div>
+      <div class="card"><h3>Your password prompt is GNOME's</h3><p>Alcatraz does not touch the prompt, its place, or the way you unlock. The clock is only moved where it is painted.</p></div>
+      <div class="card"><h3>It fails soft</h3><p>If a GNOME version changes a part of the lock screen that Alcatraz looks for, the lock screen simply stays GNOME's own.</p></div>
+      <div class="card"><h3>Leaves nothing behind</h3><p>Switched off, even while the screen is locked, the lock screen goes back to GNOME's own at once.</p></div>
+      <div class="card"><h3>Tested by locking</h3><p>A hidden GNOME Shell is locked and unlocked again and again, and every part is checked: on GNOME 42, 46 and 51, and in the continuous integration on 42 to 51.</p></div>
+    </div>
+    <figure>
+      <img src="assets/password.jpg" width="1280" height="720" alt="The password page with Alcatraz: GNOME's own avatar and password field, in the desktop's theme, over the sharp wallpaper">
+      <figcaption>The password page stays GNOME's own, in your theme.</figcaption>
+    </figure>
+  </section>
+
+  <section id="install">
+    <h2>Install</h2>
+    <p>Alcatraz needs GNOME 42 or newer. Keeping the theme needs the User Themes extension, the one that sets your shell theme (package <code>gnome-shell-extensions</code> on Debian and Ubuntu, <code>gnome-shell-extension-user-theme</code> on Fedora). The other parts work without it.</p>
+    <p><b>From a release:</b> download the zip for your GNOME version from the <a href="https://github.com/saikatnjm/alcatraz/releases">releases page</a>, <code>alcatraz-gnome42-44</code> for GNOME 42 to 44 or <code>alcatraz-gnome45-plus</code> for GNOME 45 and later, and install it with GNOME's own tool, which also prepares the settings:</p>
+    <pre><code>gnome-extensions install --force alcatraz-gnome45-plus.shell-extension.zip</code></pre>
+    <p>Log out and back in, switch Alcatraz on in the Extensions app, and lock the screen with Super+L.</p>
+    <p><b>From the source:</b></p>
+    <pre><code>git clone https://github.com/saikatnjm/alcatraz.git
+cd alcatraz
+make install</code></pre>
+    <p>To remove it: <code>gnome-extensions uninstall alcatraz@saikatnjm.github.io</code>, or <code>make uninstall</code> in the source folder.</p>
+  </section>
+
+  <section>
+    <h2>Settings</h2>
+    <div class="settings">
+      <img src="assets/settings.png" width="640" height="576" alt="The settings window of Alcatraz">
+      <table>
+        <tr><th>Setting</th><th>Default</th></tr>
+        <tr><td>Keep the desktop's theme</td><td>on</td></tr>
+        <tr><td>Change how the wallpaper shows</td><td>on: blur 0, brightness 85 %</td></tr>
+        <tr><td>Date above the time</td><td>on</td></tr>
+        <tr><td>Hide AM and PM</td><td>on</td></tr>
+        <tr><td>Move the clock up</td><td>on: 12 % from the top</td></tr>
+        <tr><td>Style the clock</td><td>on: 96 pt and 20 pt, the desktop's font</td></tr>
+      </table>
+    </div>
+    <p>Open them from the Extensions app. Changes show the next time the screen locks.</p>
+  </section>
+
+  <footer>
+    <p>Alcatraz is free software under the GPL, version 3 or later. <a href="https://github.com/saikatnjm/alcatraz">Source, questions and problems on GitHub</a>.</p>
+    <p>The wallpaper in the pictures is drawn by the project's own test. Mac is a trademark of Apple Inc. Alcatraz is not connected with or endorsed by Apple.</p>
+  </footer>
+</div>
+</body>
+</html>

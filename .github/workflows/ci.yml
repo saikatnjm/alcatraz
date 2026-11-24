@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and check the zips
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the schema compiler and zip
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libglib2.0-bin zip
+      - name: Build both zips
+        run: tools/build.sh zip
+      - name: Check them with extensions.gnome.org's checker (Shexli)
+        run: |
+          python3 -m venv "$RUNNER_TEMP/shexli"
+          "$RUNNER_TEMP/shexli/bin/pip" install --quiet "git+https://gitlab.gnome.org/Infrastructure/extensions-web.git#subdirectory=shexli"
+          status=0
+          for zip in dist/alcatraz-$(cat VERSION)-*.zip; do
+            echo "== $zip"
+            "$RUNNER_TEMP/shexli/bin/shexli" "$zip" | tee shexli.txt
+            grep -q "clean (0 findings" shexli.txt || status=1
+          done
+          exit $status
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alcatraz-zips
+          path: dist/*.zip
+
+  lock-screen:
+    name: GNOME ${{ matrix.gnome }} (${{ matrix.base }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {gnome: "42", base: "ubuntu:22.04", dockerfile: Dockerfile.apt}
+          - {gnome: "43", base: "debian:12", dockerfile: Dockerfile.apt}
+          - {gnome: "46", base: "ubuntu:24.04", dockerfile: Dockerfile.apt}
+          - {gnome: "48", base: "debian:13", dockerfile: Dockerfile.apt}
+          - {gnome: "49", base: "fedora:43", dockerfile: Dockerfile.dnf}
+          - {gnome: "50", base: "ubuntu:26.04", dockerfile: Dockerfile.apt}
+          - {gnome: "51", base: "fedora:45", dockerfile: Dockerfile.dnf}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the schema compiler and zip
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libglib2.0-bin zip
+      - name: Build a container with this GNOME Shell and the User Themes extension
+        run: docker build -t alcatraz-test -f tests/${{ matrix.dockerfile }} --build-arg BASE=${{ matrix.base }} tests
+      - name: Lock and unlock a hidden GNOME Shell and check the lock screen
+        run: tests/in-container.sh alcatraz-test build/test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lock-screen-gnome-${{ matrix.gnome }}
+          path: build/test

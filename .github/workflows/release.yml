@@ -1,0 +1,35 @@
+name: Release
+
+# Pushing a tag like v1.0.0 builds both zips and publishes them as a GitHub release, each once
+# with the version in its name and once under a fixed name for the "latest" download links.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the schema compiler and zip
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libglib2.0-bin zip
+      - name: The tag must match the VERSION file
+        run: test "v$(cat VERSION)" = "$GITHUB_REF_NAME"
+      - name: Build
+        run: tools/build.sh zip
+      - name: Release notes from the changelog
+        run: |
+          version=$(cat VERSION)
+          awk -v v="$version" '
+            /^## \[/ { printing = index($0, "[" v "]") > 0; next }
+            /^\[[0-9]/ { printing = 0 }
+            printing { print }
+          ' CHANGELOG.md > notes.md
+          cat notes.md
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.zip --title "Alcatraz $(cat VERSION)" --notes-file notes.md

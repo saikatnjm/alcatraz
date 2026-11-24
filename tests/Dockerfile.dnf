@@ -1,0 +1,17 @@
+# GNOME Shell test image for Fedora (see tests/in-container.sh). It has GNOME Shell and the
+# User Themes extension, whose theme Alcatraz keeps on the lock screen.
+#   docker build -t alcatraz-test:gnome51 -f tests/Dockerfile.dnf --build-arg BASE=fedora:45 tests
+ARG BASE=fedora:45
+FROM ${BASE}
+USER root
+RUN set -e; \
+    dnf -y install --setopt=install_weak_deps=False \
+      gnome-shell gnome-shell-extension-user-theme gjs dbus-daemon /usr/bin/gresource \
+      mesa-dri-drivers mesa-libEGL mesa-libGLES librsvg2 procps-ng; \
+    dnf clean all; \
+    id tester >/dev/null 2>&1 || useradd -m tester
+# No systemd runs in the container. Without this folder GNOME Shell uses its built-in fallback
+# for login sessions instead of looking for logind on a system bus that is not there.
+RUN rm -rf /run/systemd
+USER tester
+WORKDIR /home/tester
